@@ -1,0 +1,12 @@
+{
+    "name": "metacritic-scraper",
+    "version": "0.0.1",
+    "description": "Scrape metacritic for album scores.",
+    "main": "metacritic-scraper.js",
+    "author": "Xavier Watkins",
+    "dependencies": {
+        "express": "latest",
+        "request": "latest",
+        "cheerio": "latest"
+    }
+}
