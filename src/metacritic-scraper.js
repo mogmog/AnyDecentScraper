@@ -10,24 +10,38 @@ app.all('/*', function(req, res, next) {
     next();
 });
 
-app.get('/score/:albumName/:artistName', function(req, res) {
-    url = 'http://www.metacritic.com/music/' + req.params.albumName.replace(/\s+/g, '-').toLowerCase() + "/" + req.params.artistName.replace(/\s+/g, '-').toLowerCase();
+app.get('/score/:artistName', function(req, res) {
+    url = 'http://www.metacritic.com/person/' + req.params.artistName.replace(/\s+/g, '-').toLowerCase();
     console.log(url);
-    request(url, function(error, response, html) {
+
+    var headers = { 
+        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.8; rv:24.0) Gecko/20100101 Firefox/24.0',
+        'Content-Type' : 'application/html' 
+    };
+
+    request({ url: url, headers: headers }, function(error, response, html) {
         if (!error) {
             var $ = cheerio.load(html);
-            console.log(html);
 
             // Finally, we'll define the variables we're going to capture
             var json = {
-                title: req.params.albumName,
-                score: ''
+                artist: req.params.artistName,
+                scores: []
             };
 
-            $('span[itemprop=ratingValue]').filter(function() {
-                var data = $(this);
-                json.score = data.text();
+            // console.log($('.credits').text());
+
+            $('.brief_metascore').each(function(i, item){
+                json.scores.push({
+                    album:$(item).find('a').text(),
+                    score:$(item).find('.metascore_w').text()
+                });
             });
+
+            // $('span[itemprop=ratingValue]').filter(function() {
+            //     var data = $(this);
+            //     json.score = data.text();
+            // });
             res.json(json);
         }
     })
